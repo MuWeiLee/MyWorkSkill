@@ -1,0 +1,4 @@
+interface:
+  display_name: "WindAlice 埋点设计"
+  short_description: "整理 WindAlice 用户行为功能点埋点命名、参数和开发指引"
+  default_prompt: "帮我按规则整理这个功能的埋点需求。"
