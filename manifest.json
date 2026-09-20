@@ -1,0 +1,47 @@
+{
+    "updatedAt":  "2026-09-20T10:24:22+08:00",
+    "schema":  1,
+    "repo":  "MuWeiLee/MyWorkSkill",
+    "skills":  [
+                   {
+                       "files":  [
+                                     {
+                                         "sha256":  "27a55fde565493c5053a89c2f2a1c1a9cc8d4b8b70ee54405666795f6f8a56f6",
+                                         "path":  "ab1-event-tracking/agents/openai.yaml"
+                                     },
+                                     {
+                                         "sha256":  "15e5289e5f69d50400bfccce4c4520a3a0e3de305ccdad15fdc5d7e3e3b9c835",
+                                         "path":  "ab1-event-tracking/references/known_events.md"
+                                     },
+                                     {
+                                         "sha256":  "acf55c2482cf6a8459ca2b156c55eefa825feb05c5719af7005c77312ef59f1f",
+                                         "path":  "ab1-event-tracking/references/page_names.md"
+                                     },
+                                     {
+                                         "sha256":  "4349ddfa1a5c874011696fa5536dffd6234641b1b8365228e40051f1fe6b2e79",
+                                         "path":  "ab1-event-tracking/references/special_params.md"
+                                     },
+                                     {
+                                         "sha256":  "a00a592cb82171eb25a9a18a6fd38dd585bc6b75e3a5ed2133ed68517876f050",
+                                         "path":  "ab1-event-tracking/SKILL.md"
+                                     }
+                                 ],
+                       "name":  "ab1-event-tracking",
+                       "version":  "1.0.0"
+                   },
+                   {
+                       "files":  [
+                                     {
+                                         "sha256":  "9ce37729dbfabae64ba435fc41cada06d23442acb637b707505beb0bacf17b29",
+                                         "path":  "myskill-sync/scripts/sync.ps1"
+                                     },
+                                     {
+                                         "sha256":  "c6f84de5d0c152ed2b9ba6e4a071642a12ed460c0b4d4148f804a728c6551f1f",
+                                         "path":  "myskill-sync/SKILL.md"
+                                     }
+                                 ],
+                       "name":  "myskill-sync",
+                       "version":  "1.0.0"
+                   }
+               ]
+}
