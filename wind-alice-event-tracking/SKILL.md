@@ -5,6 +5,19 @@ description: Use when designing, reviewing, or updating user behavior event trac
 
 # Alice Event Tracking
 
+## 版本自检（每次使用前）
+
+本技能的规范部分由 Git 仓库 `MuWeiLee/MyWorkSkill`（`wind-alice-event-tracking`）管理版本。被触发（埋点 / 用户行为 / 功能点 / 体贴系统埋点等场景）时，先运行：
+
+```powershell
+scripts/check.ps1 -Mode auto   # 检查 Git 最新版本，有更新则同步后继续
+scripts/check.ps1 -Mode check  # 仅检查，不写入
+```
+
+- **Git 管理文件（随版本更新）**：本 `SKILL.md`、`agents/openai.yaml`、`references/page_names.md`、`references/special_params.md`。
+- **仅本地文件（不随 Git 更新）**：`references/local/`（飞书 Base 坐标、体贴系统回流等内部信息）、`references/known_events.md`（已确认事件与功能点ID）、`references/feishu_enum_snapshot.md`（枚举快照）、`.lark-base-setup/`、`scripts/`（除 `check.ps1` 外的本地工具）。
+- 网络不可用时提示并继续使用本地版本，不阻断任务。
+
 ## WindAlice Official Website Channel Source Rule
 
 When designing WindAlice official website or landing-page event tracking, use the URL query parameter `page_from` to distinguish external channel sources.
@@ -67,7 +80,7 @@ Use this skill to turn feature designs into consistent event tracking requiremen
 
 ## Workflow
 
-1. **同步并查阅枚举值** — 启动埋点处理时，先运行 `python scripts/sync_flybase_enum_snapshot.py` 把飞书 Base「参数取值规范」刷新为本地快照 `references/feishu_enum_snapshot.md`（幂等，失败不影响主流程，仅提示）；随后**优先实时查飞书 Base**（命令见 Consistency Maintenance），按 `取值类型` 筛选复用已有的 function_name / page_name / target_type / app_name / target_event / target_id 值，避免新建重复。**断网或 lark-cli 不可用时**，直接读取本地快照 `references/feishu_enum_snapshot.md`，再交叉参考 `references/page_names.md` / `references/known_events.md`。
+1. **查阅已有取值** — 启动埋点处理时，先查阅本地 `references/known_events.md` / `references/page_names.md` 与本地快照 `references/feishu_enum_snapshot.md`（刷新命令见 `references/local/feishu.md`），复用已有的 page_name / target_type / app_name / target_event / target_id 值，避免新建重复。飞书 Base 的实时查询方式见本地文件 `references/local/feishu.md`。
 2. Identify each user-triggered function point.
 3. Name it with this pattern:
 
@@ -97,7 +110,7 @@ Examples:
 6. If the 功能点ID is not available yet, mark it as `待申请`.
 7. **输出埋点方案** — 以 Block 格式输出每个功能点的完整方案（见 Output Format），供产品/开发贴入体贴系统功能点申请。
 8. **生成批量导入Excel** — 用户要求"生成批量导入excel"时，按「批量导入 Excel 生成」一节生成申请文件（功能点编号留空，导入体贴系统时自动生成）。
-9. **申请后回流飞书** — 用户将 Excel 导入体贴系统完成申请、导出最终结果（CSV 或 Excel）后，按「体贴系统申请后回流飞书」一节写入飞书并校验真实写入。**不自动触发**，每次回流都须等用户明确指令。
+9. **申请后回流** — 用户将 Excel 导入体贴系统完成申请、导出最终结果后，按 `references/local/feishu.md` 的「体贴系统申请后回流飞书」写入并校验。**不自动触发**，每次回流都须等用户明确指令。
 
 ## Standard Parameters
 
@@ -124,7 +137,7 @@ Rules:
   - `action` — reporting a state change caused by user interaction or system transition
 - Prefer structured IDs (e.g. `userId`, `agentId`) over display names in `target_detail_info`; include both only if implementation can pass structured detail.
 - If one feature appears on many pages, keep one function concept where reasonable and distinguish source with `page_name`.
-- For confirmed events and assigned 功能点ID values, see `references/known_events.md`.
+- For confirmed events and assigned 功能点ID values, see local `references/known_events.md`（内部，仅本地）。
 - For API, session, feedback, website, or startup events, use the extra fields in `references/special_params.md` instead of forcing all data into `target_detail_info`.
 
 ## Development Guidance: Report Type
@@ -215,127 +228,14 @@ wb.save(OUT)
 
 以模板文件为基准复制「功能点」sheet 样式（表头不变，只填数据行），覆盖模板自带示例行。文件保存到用户指定路径，默认当前工作目录，命名如 `功能点批量导入-自动任务-20260916.xlsx`。
 
-## 体贴系统申请后回流飞书
+## 本地信息（不进 Git）
 
-流程：
-
-```text
-1. 用户将生成的「批量导入Excel」导入体贴系统（公司埋点系统），完成功能点申请，系统自动生成功能点ID
-2. 用户从体贴系统导出最终结果（CSV 或 Excel，含自动生成的功能点ID与全部参数）
-3. 用户提供导出文件 → 按字段映射解析，逐条写入飞书 Base「已知功能点总表」
-4. 新增取值追加到「参数取值规范」表
-5. 读回校验，确保真实写入
-```
-
-字段映射（导出文件列 → 「已知功能点总表」字段）：
-
-```text
-功能点编号               → 功能点ID
-所属页面ID / 所属页面名称 → 同名字段
-功能点名称               → 功能点名称
-上报类型（若有）          → 上报类型
-参数组「参数N（中文/英文/描述）」→ 按参数名映射到 app_name / function_name / page_name / target_id / target_type / target_event / target_detail_info / os / abtest_group / 备注；参数描述即该字段值
-无法映射到标准字段的参数（如 page_from、source、price 等特殊参数）→ 按 references/special_params.md 规范处理，必要时记入「特殊参数事件」表
-```
-
-每次写入时附加编辑信息（`最后编辑人员` / `最后编辑人姓名` / `最后编辑时间`，创建与更新都填写）：
-
-```text
-最后编辑人员（user 字段，multiple）       → 值格式 [{"id":"ou_xxx"}]；取 lark-cli whoami 的 onBehalfOf.openId（即当前操作人），不硬编码、不臆造 ID；解析失败则跳过该字段并提示
-最后编辑人姓名（text 字段，冗余姓名）     → 取 lark-cli whoami 的 onBehalfOf.userName（如"李牧微"），与上面 ID 同源；方便 CSV 导出直接阅读
-最后编辑时间（datetime 字段）             → 当前时间 Asia/Shanghai 的 "yyyy-MM-dd HH:mm" 文本，例如 "2026-09-18 10:00"
-```
-
-写入命令（每批最多 200 条，超出分批串行写同一 Table）：
-
-```bash
-lark-cli base +record-batch-create \
-  --base-token AmaDbLGsEaXwW5sQHhHcWZEOnqb \
-  --table-id tblA0Qi66a4mhK3Z \
-  --json @records.json \
-  --as user
-```
-
-records.json（每条记录附加编辑信息，人员取 `lark-cli whoami` 的 onBehalfOf.openId / userName）：
-
-```json
-{"create_records":[{"功能点名称":"<name>","功能点ID":"<id>","上报类型":["<type>"],"所属页面ID":"<page_id>","所属页面名称":"<page_name>","app_name":["<app>"],"function_name":"<fn>","page_name":"<pn>","target_id":"<tid>","target_type":["<tt>"],"target_event":["<te>"],"target_detail_info":"<detail>","os":"<os>","abtest_group":"<ab>","备注":"<remark>","最后编辑人员":[{"id":"<openId>"}],"最后编辑人姓名":"<userName>","最后编辑时间":"<yyyy-MM-dd HH:mm>"}]}
-```
-
-扩展「参数取值规范」：导出结果中出现新增的 function_name / page_name / target_id / target_type / target_event / app_name 取值时，追加到「参数取值规范」表（`tbl6qXSm3ECApDVf`），闭集枚举（app_name / target_type / target_event）需同步更新「枚举集合」列。
-
-校验真实写入：写入后必须按功能点ID / 功能点名称过滤读回（`lark-cli base +record-list`），逐条核对记录存在且字段值一致；发现缺失或异常，补齐/重试后再次校验，全部确认后向用户汇报结果。
-
-**不自动触发**：写入飞书与扩展参数取值必须等用户明确指令后执行。
-
-## Consistency Maintenance
-
-创建或更新功能点时，必须执行以下流程，确保跨会话一致性。**主数据源为飞书 Base，本地 `references/*.md` 仅作 fallback**。
-
-### 飞书 Base 坐标
-
-```text
-Base URL:  https://my.feishu.cn/base/AmaDbLGsEaXwW5sQHhHcWZEOnqb
-Base Token: AmaDbLGsEaXwW5sQHhHcWZEOnqb
-
-Table 映射：
-- 参数取值规范（读 + 扩展）  → table_id: tbl6qXSm3ECApDVf
-- 已知功能点总表（写回流）  → table_id: tblA0Qi66a4mhK3Z
-- 特殊参数事件（读 + 写）   → table_id: tblsOcsY5EpcPlwP
-```
-
-依赖环境：lark-cli 已绑定 user 身份。**直连 open.feishu.cn 会被网络重置，调用前必须显式设置代理：`HTTP_PROXY=http://10.106.60.172:8080`、`HTTPS_PROXY=http://10.106.60.172:8080`**（环境已提供代理时跳过）。
-
-### 使用前：查阅
-
-填写参数前，优先查 Base「参数取值规范」表，复用已有取值，避免新建同义不同名：
-
-```bash
-# 查询全部取值
-lark-cli base +record-list --base-token AmaDbLGsEaXwW5sQHhHcWZEOnqb --table-id tbl6qXSm3ECApDVf --as user
-
-# 按取值类型筛选（filter 写入 json 文件后以 @file.json 传入）
-# filter-page.json: {"logic":"and","conditions":[["取值类型","intersects",["page_name"]]]}
-lark-cli base +record-list --base-token AmaDbLGsEaXwW5sQHhHcWZEOnqb --table-id tbl6qXSm3ECApDVf --as user --filter-json @filter-page.json
-```
-
-按 `取值类型` 筛选：app_name / function_name / page_name / target_id / target_type / target_event。
-
-**Fallback（断网/不可用时）：** 直接读本地快照 `references/feishu_enum_snapshot.md`（含更新时间），再交叉参考 `references/page_names.md` / `references/known_events.md`。快照刷新命令：`python scripts/sync_flybase_enum_snapshot.py`。
-
-### 确认后：回流（仅在用户明确指令"回流到飞书"时执行）
-
-回流数据以体贴系统导出结果为最终数据源（含自动生成的功能点ID），按「体贴系统申请后回流飞书」一节写入「已知功能点总表」；同时把新增取值追加到「参数取值规范」，并把两类新增同步回本地 `references/*.md`，保持双写一致。
-
-**不自动触发**，每次都必须等用户明确指令。
-
-### 扩展参数取值（新增枚举值 / 新增取值）
-
-出现新的 function_name / page_name / target_id / target_type / target_event 取值时，追加到「参数取值规范」表，保持可扩展：
-
-```bash
-lark-cli base +record-batch-create \
-  --base-token AmaDbLGsEaXwW5sQHhHcWZEOnqb \
-  --table-id tbl6qXSm3ECApDVf \
-  --json '{"create_records":[{"取值":"<new_value>","取值类型":["<type>"],"中文名称":"<cn_name>","所属模块":"<module>","是否枚举":false}]}' \
-  --as user
-```
-
-规则：
-- 追加而非覆盖，保留历史记录。
-- 同义词（如"对话"和"会话"指向同一 page_name）统一用已有值，不新增。
-- `app_name` / `target_type` / `target_event` 为闭集枚举，新增需同步更新对应行的「枚举集合」列。
-- `function_name` / `page_name` / `target_id` 为已用值清单，新增直接追加行。
-- 同步更新本地 `references/*.md` 作为 fallback，保持双写一致。
+飞书 Base 坐标与表 ID、体贴系统申请后回流飞书、一致性维护（实时查枚举/扩展取值）、本地枚举快照刷新等内部信息，全部保存在本地文件 `references/local/feishu.md`，**不随 Git 版本分发**。使用前查阅该文件获取飞书相关配置与命令。
 
 ## References
 
-- 飞书 Base「参数取值规范」（table_id: `tbl6qXSm3ECApDVf`）— function_name / page_name / target_type / app_name / target_event / target_id 取值规范，随用随沉淀。
-- 飞书 Base「已知功能点总表」（table_id: `tblA0Qi66a4mhK3Z`）— 已确认的功能点ID及完整参数，以体贴系统导出结果回流。
-- 飞书 Base「特殊参数事件」（table_id: `tblsOcsY5EpcPlwP`）— 非UI类事件（page_from / source,target / price,isCustom 等）的特殊参数。
-- 批量导入Excel模板 — 用户提供的 `FuncPointTemplate.xlsx`，结构见「批量导入 Excel 生成」。
-- 体贴系统 — 公司埋点系统，功能点申请/功能点ID生成与最终结果导出的系统。
-- 本地快照 `references/feishu_enum_snapshot.md` — 飞书「参数取值规范」的本地镜像（带更新时间），断网时首选；刷新脚本 `scripts/sync_flybase_enum_snapshot.py`。
-- 本地 `references/page_names.md` — fallback，飞书不可用时查阅。
-- 本地 `references/known_events.md` — fallback，飞书不可用时查阅。
-- 本地 `references/special_params.md` — fallback，飞书不可用时查阅。
+- `references/page_names.md` — function_name / page_name 命名与历史取值（Git 管理）。
+- `references/special_params.md` — API/会话/反馈/官网等特殊事件字段规范（Git 管理）。
+- `references/local/feishu.md` — 飞书 Base 坐标、体贴系统回流、一致性维护（**仅本地**）。
+- `references/known_events.md` — 已确认的功能点ID与完整参数（**仅本地**）。
+- `references/feishu_enum_snapshot.md` — 飞书「参数取值规范」本地镜像快照（**仅本地**）。

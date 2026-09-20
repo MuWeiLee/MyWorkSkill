@@ -1,5 +1,5 @@
 {
-    "updatedAt":  "2026-09-20T10:38:14+08:00",
+    "updatedAt":  "2026-09-20T10:49:40+08:00",
     "schema":  1,
     "repo":  "MuWeiLee/MyWorkSkill",
     "skills":  [
@@ -10,14 +10,6 @@
                                          "path":  "wind-alice-event-tracking/agents/openai.yaml"
                                      },
                                      {
-                                         "sha256":  "c219142e29d0837accf01ec85d8244a6a2cd6d32afe16e9732d4da957e756745",
-                                         "path":  "wind-alice-event-tracking/references/feishu_enum_snapshot.md"
-                                     },
-                                     {
-                                         "sha256":  "f110f8065a3af784dff57b814932eb0252f39b3b65d2a650f6b11dce6c044a08",
-                                         "path":  "wind-alice-event-tracking/references/known_events.md"
-                                     },
-                                     {
                                          "sha256":  "7b38d4fb26d9b766641d53e2c201323d2156adf15245f2e3d1d6141d32bce347",
                                          "path":  "wind-alice-event-tracking/references/page_names.md"
                                      },
@@ -26,12 +18,12 @@
                                          "path":  "wind-alice-event-tracking/references/special_params.md"
                                      },
                                      {
-                                         "sha256":  "6b09c77eeb534972bd5d9c7ee56950b609208a534c85c8e00c3669640c18a459",
+                                         "sha256":  "d571d4990b8ced5c2a9f5ebe2bd4bdb4efaa0010b483f1657ec43af86f561c6b",
                                          "path":  "wind-alice-event-tracking/SKILL.md"
                                      }
                                  ],
                        "name":  "wind-alice-event-tracking",
-                       "version":  "1.0.0"
+                       "version":  "1.0.1"
                    }
                ]
 }
