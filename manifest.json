@@ -1,5 +1,5 @@
 {
-    "updatedAt":  "2026-09-20T10:24:22+08:00",
+    "updatedAt":  "2026-09-20T10:27:48+08:00",
     "schema":  1,
     "repo":  "MuWeiLee/MyWorkSkill",
     "skills":  [
@@ -32,7 +32,7 @@
                    {
                        "files":  [
                                      {
-                                         "sha256":  "9ce37729dbfabae64ba435fc41cada06d23442acb637b707505beb0bacf17b29",
+                                         "sha256":  "b6270ef7f397f11ce5a0fc76234ada62628e7356e4b995db9572b4411ceb6266",
                                          "path":  "myskill-sync/scripts/sync.ps1"
                                      },
                                      {
@@ -41,7 +41,7 @@
                                      }
                                  ],
                        "name":  "myskill-sync",
-                       "version":  "1.0.0"
+                       "version":  "1.0.1"
                    }
                ]
 }
