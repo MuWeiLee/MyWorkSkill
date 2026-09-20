@@ -1,0 +1,4 @@
+interface:
+  display_name: "AB1 埋点设计"
+  short_description: "整理 AB1/WindClaw 功能点埋点命名、参数和申请表规则"
+  default_prompt: "帮我按 AB1 规则整理这个功能的埋点需求。"
