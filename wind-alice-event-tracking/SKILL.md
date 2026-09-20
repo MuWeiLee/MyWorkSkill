@@ -115,7 +115,7 @@ Examples:
 ## Standard Parameters
 
 ```text
-app_name           产品+端标识，固定枚举：windAlice_web / windAlice_pc / windAlice_app / windAlice_h5 / windAlice_miniApp / windAlice_desktop
+app_name           产品+端标识，固定枚举：windAlice_web / windAlice_pc / windAlice_app / windAlice_h5 / windAlice_miniApp / windAlice_desktop；未特别说明为移动端/小程序的功能，直接写出对应枚举值（如网页功能 → windAlice_web，桌面端 → windAlice_pc）
 function_name      大功能模块，例如 chat / work / link / userCenter（可扩展）
 page_name          详细页面名称，lower camelCase
 target_id          组件标识，lower camelCase；同一个功能点ID可支持多个 target_id 表示状态切换
@@ -127,7 +127,8 @@ os                 macOS / iOS / ipadOS / windows / android / harmonyOS（开发
 
 Rules:
 
-- `app_name` is chosen from the fixed enum based on the current product's platform.
+- `app_name` 默认直接写出枚举值：未特别说明是移动端/小程序的功能，直接给出对应端值（如网页功能 `windAlice_web`），不要留空或写"待确认"；仅当用户明确为移动端/小程序时才选 `windAlice_app` / `windAlice_miniApp`。
+- `function_name` 必须严格参考「参数取值规范」已有用值（本地快照 `references/feishu_enum_snapshot.md`，实时表见 `references/local/feishu.md`）复用已确认的功能域，避免新增过多取值；若不确定或找不到匹配取值，必须先与使用人确认，确认后才可以新增。
 - `function_name` represents large functional modules; expand as the product grows. See `references/page_names.md` for confirmed module and page name values.
 - `function_name` 与 `page_name` 的层级关系：`function_name` 是顶级功能域，对应一级路由/主导航Tab；`page_name` 是该功能域下的具体页面，对应二级路由/页面组件。一个 `function_name` 下可有多个 `page_name`。
 - Use lower camelCase for `page_name` and `target_id`, for example `conversation`, `openSharePopup`, `chooseAgent`.
@@ -153,7 +154,7 @@ Rules:
 
 ## Output Format
 
-埋点初步分析与最终埋点方案一律使用 **Block 格式**呈现，禁止使用 markdown 表格，禁止整理成表格样式。
+所有输出数据（埋点方案、参数取值、枚举对照等）一律优先使用 **Block 格式**，禁止使用 markdown 表格，禁止整理成表格样式。埋点初步分析与最终埋点方案均遵循此规则。
 
 每个功能点一个 code block：
 

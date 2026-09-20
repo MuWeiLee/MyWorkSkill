@@ -1,5 +1,5 @@
 {
-    "updatedAt":  "2026-09-20T10:49:40+08:00",
+    "updatedAt":  "2026-09-20T11:46:30+08:00",
     "schema":  1,
     "repo":  "MuWeiLee/MyWorkSkill",
     "skills":  [
@@ -18,12 +18,12 @@
                                          "path":  "wind-alice-event-tracking/references/special_params.md"
                                      },
                                      {
-                                         "sha256":  "d571d4990b8ced5c2a9f5ebe2bd4bdb4efaa0010b483f1657ec43af86f561c6b",
+                                         "sha256":  "d54a28889740bf401d1242d1af8483c5dd576c08b9ace93b7e319ce250e2b2d6",
                                          "path":  "wind-alice-event-tracking/SKILL.md"
                                      }
                                  ],
                        "name":  "wind-alice-event-tracking",
-                       "version":  "1.0.1"
+                       "version":  "1.0.2"
                    }
                ]
 }
